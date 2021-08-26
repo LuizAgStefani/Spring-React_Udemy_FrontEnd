@@ -1,22 +1,38 @@
 import React, { Component } from "react";
 import Card from "../components/Card";
 import FormGroup from "../components/FormGroup";
-import {withRouter} from 'react-router-dom';
+import { withRouter } from "react-router-dom";
 
+import UsuarioService from "../app/service/UsuarioService";
+import LocalStorageService from "../app/service/LocalStorageService";
 class Login extends React.Component {
   state = {
     email: "",
     senha: "",
+    mensagemErro: null,
   };
 
+  constructor(){
+    super();
+    this.service = new UsuarioService();
+  }
+
   entrar = () => {
-    console.log("Email: ", this.state.email);
-    console.log("Senha: ", this.state.senha);
+    this.service.autenticar({
+      email: this.state.email,
+      senha: this.state.senha
+    }).then((response) => {
+      LocalStorageService.adicionarItem("_usuario_logado", response.data)
+        this.props.history.push("/home");
+      })
+      .catch((erro) => {
+        this.setState({ mensagemErro: erro.response.data });
+      });
   };
 
   prepareCadastrar = () => {
-    this.props.history.push('/cadastro-usuarios')
-  }
+    this.props.history.push("/cadastro-usuarios");
+  };
 
   render() {
     return (
@@ -27,6 +43,9 @@ class Login extends React.Component {
         >
           <div className="bs-docs-section">
             <Card title="Login">
+              <div className="row">
+                <span>{this.state.mensagemErro}</span>
+              </div>
               <div className="row">
                 <div className="col-lg-12">
                   <div className="bs-component">
@@ -62,7 +81,12 @@ class Login extends React.Component {
                       <button onClick={this.entrar} className="btn btn-success">
                         Entrar
                       </button>
-                      <button onClick={this.prepareCadastrar} className="btn btn-danger">Cadastrar</button>
+                      <button
+                        onClick={this.prepareCadastrar}
+                        className="btn btn-danger"
+                      >
+                        Cadastrar
+                      </button>
                     </fieldset>
                   </div>
                 </div>
