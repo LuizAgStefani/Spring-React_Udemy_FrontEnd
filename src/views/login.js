@@ -5,6 +5,8 @@ import { withRouter } from "react-router-dom";
 
 import UsuarioService from "../app/service/UsuarioService";
 import LocalStorageService from "../app/service/LocalStorageService";
+import {mensagemErro} from '../components/Toastr'
+
 class Login extends React.Component {
   state = {
     email: "",
@@ -26,7 +28,7 @@ class Login extends React.Component {
         this.props.history.push("/home");
       })
       .catch((erro) => {
-        this.setState({ mensagemErro: erro.response.data });
+        mensagemErro(erro.response.data)
       });
   };
 
