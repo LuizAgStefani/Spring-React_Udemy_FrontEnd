@@ -8,12 +8,13 @@ import LancamentosTable from "./LancamentosTable";
 import LancamentoService from "../../app/service/LancamentoService";
 import LocalStorageService from "../../app/service/LocalStorageService"
 
-import {mensagemErro} from "../../components/Toastr"
+import * as messages from "../../components/Toastr"
 class ConsultaLancamentos extends Component {
   state = {
     ano: "",
     mes: "",
     tipo: "",
+    descricao: "",
     lancamentos: []
   };
 
@@ -25,12 +26,23 @@ class ConsultaLancamentos extends Component {
 
   buscar = () => {
 
+    if(!this.state.ano){
+      messages.mensagemErro('O campo "Ano" é obrigatório.')
+      return false;
+    }
+
+    if(!this.state.mes){
+      messages.mensagemErro('O campo "Mês" é obrigatório.')
+      return false;
+    }
+
     const usuarioLogado = LocalStorageService.obterItem('_usuario_logado')
 
     const lancamentoFiltro = {
       ano: this.state.ano,
       mes: this.state.mes,
       tipo: this.state.tipo,
+      descricao: this.state.descricao,
       usuario: usuarioLogado.id
     }
 
@@ -40,38 +52,39 @@ class ConsultaLancamentos extends Component {
       this.setState({lancamentos: resposta.data})
     })
     .catch(erro => {
-      mensagemErro(erro)
+      messages.mensagemErro(erro)
     })
   }
 
-  render() {
-    const meses = [
-      { label: "Selecione...", value: "" },
-      { label: "Janeiro", value: 1 },
-      { label: "Fevereiro", value: 2 },
-      { label: "Março", value: 3 },
-      { label: "Abril", value: 4 },
-      { label: "Maio", value: 5 },
-      { label: "Junho", value: 6 },
-      { label: "Julho", value: 7 },
-      { label: "Agosto", value: 8 },
-      { label: "Setembro", value: 9 },
-      { label: "Outubro", value: 10 },
-      { label: "Novembro", value: 11 },
-      { label: "Dezembro", value: 12 },
-    ];
+  editar = (id) => {
+    console.log(id)
+  }
 
-    const tipos = [
-      { label: "Selecione...", value: "" },
-      { label: "Despesa", value: "DESPESA" },
-      { label: "Receita", value: "RECEITA" },
-    ];
+  deletar = (id) => {
+    console.log(id)
+  }
+
+  render() {
+    const meses = this.lancamentoService.obterListaMeses();
+
+    const tipos = this.lancamentoService.obterTiposLancamentos();
 
     return (
       <Card title="Consulta Lançamentos">
         <div className="row">
           <div className="col-md-6">
             <div className="bs-component">
+              <FormGroup label="Descrição: " htmlFor="inputDescricao">
+                <input
+                  value={this.state.descricao}
+                  onChange={(e) => this.setState({ descricao: e.target.value })}
+                  type="text"
+                  className="form-control"
+                  id="inputDescricao"
+                  placeholder="Digite a Descrição"
+                ></input>
+              </FormGroup>
+              <br/>
               <FormGroup label="Ano: *" htmlFor="inputAno">
                 <input
                   value={this.state.ano}
@@ -116,7 +129,7 @@ class ConsultaLancamentos extends Component {
           <div className="col-md-12">
             <div className="bs-component">
               <br />
-              <LancamentosTable lancamentos={this.state.lancamentos} />
+              <LancamentosTable lancamentos={this.state.lancamentos} editar={this.editar} deletar={this.deletar}/>
             </div>
           </div>
         </div>
