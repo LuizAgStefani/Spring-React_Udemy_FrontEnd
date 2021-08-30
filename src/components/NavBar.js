@@ -1,11 +1,12 @@
 import React from "react";
 import NavBarItem from "./NavBarItem";
+import { AuthConsumer } from '../main/ProvedorAutenticacao'
 
-export default function NavBar() {
+function NavBar(props) {
   return (
     <div className="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
       <div className="container">
-        <a href="home.html" className="navbar-brand">
+        <a href="#/home" className="navbar-brand">
           Minhas Finanças
         </a>
         <button
@@ -21,13 +22,22 @@ export default function NavBar() {
         </button>
         <div className="collapse navbar-collapse" id="navbarResponsive">
           <ul className="navbar-nav">
-            <NavBarItem href="#/home" label="Home"/>
-            <NavBarItem href="#/cadastro-usuarios" label="Usuários"/>
-            <NavBarItem href="#/" label="Lançamentos"/>
-            <NavBarItem href="#/login" label="Login"/>
+            <NavBarItem render={props.isUsuarioAutenticado} href="#/home" label="Home"/>
+            <NavBarItem render={props.isUsuarioAutenticado} href="#/cadastro-usuarios" label="Usuários"/>
+            <NavBarItem render={props.isUsuarioAutenticado} href="#/consulta-lancamentos" label="Lançamentos"/>
+            <NavBarItem render={props.isUsuarioAutenticado} onClick={props.deslogar} href="#/login" label="Sair"/>
           </ul>
         </div>
       </div>
     </div>
   );
 }
+
+// eslint-disable-next-line import/no-anonymous-default-export
+export default () => (
+  <AuthConsumer>
+    {(context) => (
+      <NavBar isUsuarioAutenticado={context.isAutenticado} deslogar={context.encerrarSessao}/>
+    )}
+  </AuthConsumer>
+)

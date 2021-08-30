@@ -2,10 +2,11 @@ import React, { Component } from "react";
 import Card from "../components/Card";
 import FormGroup from "../components/FormGroup";
 import { withRouter } from "react-router-dom";
+import { AuthContext } from "../main/ProvedorAutenticacao";
 
 import UsuarioService from "../app/service/UsuarioService";
 import LocalStorageService from "../app/service/LocalStorageService";
-import {mensagemErro} from '../components/Toastr'
+import { mensagemErro } from "../components/Toastr";
 
 class Login extends React.Component {
   state = {
@@ -14,21 +15,24 @@ class Login extends React.Component {
     mensagemErro: null,
   };
 
-  constructor(){
+  constructor() {
     super();
     this.service = new UsuarioService();
   }
 
   entrar = () => {
-    this.service.autenticar({
-      email: this.state.email,
-      senha: this.state.senha
-    }).then((response) => {
-      LocalStorageService.adicionarItem("_usuario_logado", response.data)
+    this.service
+      .autenticar({
+        email: this.state.email,
+        senha: this.state.senha,
+      })
+      .then((response) => {
+        LocalStorageService.adicionarItem("_usuario_logado", response.data);
+        this.context.iniciarSessao(response.data)
         this.props.history.push("/home");
       })
       .catch((erro) => {
-        mensagemErro(erro.response.data)
+        mensagemErro(erro.response.data);
       });
   };
 
@@ -80,14 +84,15 @@ class Login extends React.Component {
                           placeholder="Digite sua Senha"
                         ></input>
                       </FormGroup>
+                      <br />
                       <button onClick={this.entrar} className="btn btn-success">
-                        Entrar
+                        <i className="pi pi-sign-in p-mr-2"></i> Entrar
                       </button>
                       <button
                         onClick={this.prepareCadastrar}
                         className="btn btn-danger"
                       >
-                        Cadastrar
+                        <i className="pi pi-plus p-mr-2"></i> Cadastrar
                       </button>
                     </fieldset>
                   </div>
@@ -100,5 +105,7 @@ class Login extends React.Component {
     );
   }
 }
+
+Login.contextType = AuthContext;
 
 export default withRouter(Login);

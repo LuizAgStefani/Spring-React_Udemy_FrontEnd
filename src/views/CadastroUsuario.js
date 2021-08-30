@@ -19,43 +19,25 @@ class CadastroUsuario extends Component {
     senhaRepetida: "",
   };
 
-  validar() {
-    const msgs = [];
-
-    if (!this.state.nome) {
-      msgs.push("O campo Nome é obrigatório.");
-    }
-
-    if (!this.state.email) {
-      msgs.push("O campo Email é obrigatório.");
-    } else if (!this.state.email.match(/^[a-z0-9.]+@[a-z0-9]+\.[a-z]/)) {
-      msgs.push("Informe um Email válido.");
-    }
-
-    if (!this.state.senha || !this.state.senhaRepetida) {
-      msgs.push("Digite a senha 2x.");
-    } else if (this.state.senha !== this.state.senhaRepetida) {
-      msgs.push("As senhas não são iguais.");
-    }
-
-    return msgs;
-  }
-
   cadastrar = () => {
-    const msgs = this.validar();
-
-    if (msgs && msgs.length > 0) {
-      msgs.forEach((msg, index) => {
-        mensagemErro(msg);
-      });
-      return false;
-    }
+    const { nome, email, senha, senhaRepetida } = this.state;
 
     const usuario = {
-      nome: this.state.nome,
-      email: this.state.email,
-      senha: this.state.senha,
+      nome,
+      email,
+      senha,
+      senhaRepetida,
     };
+
+    try{
+      this.service.validar(usuario)
+    }catch(erro){
+      const msgs = erro.mensagens;
+      msgs.forEach(msg => {
+        mensagemErro(msg)
+      })
+      return false;
+    }
 
     this.service
       .cadastrar(usuario)
@@ -118,19 +100,20 @@ class CadastroUsuario extends Component {
                   className="form-control"
                 />
               </FormGroup>
+              <br></br>
               <button
                 onClick={this.cadastrar}
                 type="button"
                 className="btn btn-success"
               >
-                Salvar
+                <i className="pi pi-save p-mr-2"></i> Salvar
               </button>
               <button
                 onClick={this.cancelarCadastro}
                 type="button"
                 className="btn btn-danger"
               >
-                Cancelar
+                <i className="pi pi-times p-mr-2"></i> Cancelar
               </button>
             </div>
           </div>
