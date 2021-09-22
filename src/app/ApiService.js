@@ -1,34 +1,42 @@
-import axios from 'axios'
+import axios from "axios";
 
-const httpClient = axios.create({
-    baseURL: 'http://localhost:8080/minhasFinancasApi'//para usar no localhost
-    //baseURL: 'http://10.30.10.26:8080/minhasFinancasApi'//para usar no server da empresa
-})
+const baseURL = process.env.REACT_APP_API_URL;
+
+export const httpClient = axios.create({
+  baseURL: baseURL,
+  withCredentials: true,
+});
 
 class ApiService {
-    constructor(apiurl) {
-        this.apiurl = apiurl;
-    }
+  constructor(apiurl) {
+    this.apiurl = apiurl;
+  }
 
-    post(url, objeto) {
-        const requestUrl = `${this.apiurl}${url}`
-        return httpClient.post(requestUrl,objeto);
+  static registrarToken(token) {
+    if (token) {
+      httpClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     }
+  }
 
-    put(url, objeto){
-        const requestUrl = `${this.apiurl}${url}`
-        return httpClient.put(requestUrl,objeto);
-    }
+  post(url, objeto) {
+    const requestUrl = `${this.apiurl}${url}`;
+    return httpClient.post(requestUrl, objeto);
+  }
 
-    delete(url) {
-        const requestUrl = `${this.apiurl}${url}`
-        return httpClient.delete(requestUrl);
-    }
+  put(url, objeto) {
+    const requestUrl = `${this.apiurl}${url}`;
+    return httpClient.put(requestUrl, objeto);
+  }
 
-    get(url) {
-        const requestUrl = `${this.apiurl}${url}`
-        return httpClient.get(requestUrl);
-    }
+  delete(url) {
+    const requestUrl = `${this.apiurl}${url}`;
+    return httpClient.delete(requestUrl);
+  }
+
+  get(url) {
+    const requestUrl = `${this.apiurl}${url}`;
+    return httpClient.get(requestUrl);
+  }
 }
 
 export default ApiService;
